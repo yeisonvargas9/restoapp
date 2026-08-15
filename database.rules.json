@@ -1,0 +1,15 @@
+{
+  "rules": {
+    "menu": {
+      ".read": true,
+      ".write": "auth != null",
+      "$platoId": {
+        ".validate": "newData.hasChildren(['name', 'price']) && newData.child('name').isString() && newData.child('price').isNumber() && newData.child('price').val() > 0"
+      }
+    },
+    "$other": {
+      ".read": false,
+      ".write": false
+    }
+  }
+}

@@ -1,60 +1,77 @@
 RestoApp - Taller de Refactorización y Uso de IA
 
 Resumen
-- Proyecto base (legacy) para que estudiantes practiquen refactorización: [index.html](index.html).
-- Contiene malas prácticas intencionales (variables globales, autenticación en cliente, lógica monolítica) pero es funcional y conectado a Firebase Realtime Database en:
-  https://stock-flow-2e23e-default-rtdb.firebaseio.com/menu.json
+- Este proyecto fue refactorizado desde una base "legacy" de una sola
+  página a una MPA (Multiple Page Application) modular. Ver
+  [CHANGELOG.md](CHANGELOG.md) para el detalle completo de los cambios.
+- Sigue conectado a Firebase Realtime Database en:
+  https://restoapp-415df-default-rtdb.firebaseio.com/menu.json
 
-Objetivo del taller
-- Transformar esta base en una MPA (Multiple Page Application) bien estructurada y modular.
-- Enseñar a usar la IA como asistente para revisar, proponer y aplicar refactorizaciones.
+Estructura del proyecto
+```
+index.html          → Página de inicio / navegación
+pedido.html          → Formulario para que el mesero tome pedidos
+login.html           → Inicio de sesión (Firebase Authentication)
+admin.html           → Panel de administración (crear productos), requiere sesión
+css/
+  styles.css          → Hoja de estilos unificada
+js/
+  firebase-config.js  → Configuración de Firebase (completar manualmente)
+  firebase-init.js    → Inicialización de Firebase App + Auth
+  menu-service.js     → Lógica de negocio: obtener/normalizar el menú
+  pedidos.js          → Lógica de negocio: validar y calcular pedidos
+  pedido-page.js       → DOM/UI de pedido.html
+  auth-service.js      → Lógica de autenticación (Firebase Auth)
+  login-page.js        → DOM/UI de login.html
+  admin-service.js      → Lógica de negocio: validar/crear productos
+  admin-page.js          → DOM/UI de admin.html
+database.rules.json    → Reglas de seguridad de Realtime Database
+CHANGELOG.md            → Historial de la refactorización
+```
+
+Configuración inicial (requerida antes de usar login/admin)
+1. Completar `js/firebase-config.js` con los datos reales de tu proyecto Firebase.
+2. Habilitar el proveedor de correo/contraseña en Firebase Authentication.
+3. Crear el usuario administrador en Firebase Authentication.
+4. Publicar `database.rules.json` en Realtime Database.
+
+Ver el detalle paso a paso en la sección "Configuración manual requerida"
+de [CHANGELOG.md](CHANGELOG.md).
 
 Instrucciones rápidas
-1. Abrir `index.html` en el navegador (doble clic). El proyecto es estático.
-2. Revisar el código y buscar los TODOs y comentarios que indican malas prácticas.
+1. Abrir `index.html` en el navegador (doble clic), o servirlo con
+   cualquier servidor estático. El proyecto sigue siendo 100% estático.
+   Nota: por usar módulos ES (`type="module"`), algunos navegadores
+   requieren servir los archivos por `http://` en vez de `file://`
+   (por ejemplo con `npx serve` o la extensión "Live Server").
+2. `pedido.html` funciona sin sesión (lectura pública del menú).
+3. `login.html` y `admin.html` requieren la configuración de Firebase
+   Authentication descrita arriba.
 
-Ejercicios sugeridos (orden recomendado)
-- Ejercicio 1 — Convertir a MPA
-  - Separar vistas en varios archivos HTML (p. ej. `index.html`, `login.html`, `admin.html`, `pedido.html`).
-  - Mantener un único `styles.css` en `css/styles.css` y enlazarlo desde cada HTML.
+Objetivo del taller
+- Transformar la base legacy en una MPA bien estructurada y modular. ✅
+- Enseñar a usar la IA como asistente para revisar, proponer y aplicar
+  refactorizaciones. ✅
 
-- Ejercicio 2 — Modularizar JavaScript
-  - Extraer funciones a archivos JS por responsabilidad (p. ej. `menu.js`, `auth.js`, `pedidos.js`).
-  - Evitar variables globales; usar módulos ES o patrones IIFE.
-
-- Ejercicio 3 — Mejorar autenticación y seguridad
-  - No dejar credenciales en cliente. Implementar (si se desea) un backend mínimo o usar Firebase Auth.
-  - Agregar reglas de seguridad en Realtime Database para restringir escritura.
-
-- Ejercicio 4 — Limpieza y pruebas
-  - Eliminar código muerto y funciones obsoletas.
-  - Añadir validaciones más estrictas y mensajes de error más claros.
-  - Escribir pruebas manuales o automatizadas (si conocen alguna herramienta simple).
-
-- Ejercicio 5 — Buenas prácticas
-  - Separar lógica de negocio de manipulación DOM.
-  - Añadir manejo de errores robusto y feedback al usuario.
+Ejercicios sugeridos (ya resueltos como referencia; útiles para revisión)
+- Ejercicio 1 — Convertir a MPA: ver `index.html`, `login.html`,
+  `pedido.html`, `admin.html`.
+- Ejercicio 2 — Modularizar JavaScript: ver carpeta `js/`, separada por
+  responsabilidad (menú, pedidos, auth, admin) y por capa (servicio vs. página).
+- Ejercicio 3 — Autenticación y seguridad: ver `auth-service.js`,
+  `database.rules.json` y la sección de configuración manual en
+  `CHANGELOG.md`.
+- Ejercicio 4 — Limpieza y pruebas: código muerto eliminado
+  (`funcionObsoletaCalculoAnterior`), validaciones agregadas.
+- Ejercicio 5 — Buenas prácticas: lógica de negocio separada de la
+  manipulación del DOM (`*-service.js` / `pedidos.js` vs. `*-page.js`).
 
 Uso de la IA como asistente
-- Pide a la IA que haga cambios pequeños y justificables: "Refactoriza `tomarTodo()` separando cálculos de impuestos.".
+- Pide a la IA que haga cambios pequeños y justificables:
+  "Refactoriza `calcularPedido()` para soportar descuentos."
 - Ejemplos de prompts útiles:
-  - "Sugiéreme una estructura de archivos para convertir esto en una MPA." 
-  - "Refactoriza este archivo para eliminar variables globales y exportar funciones como módulo." 
-  - "Detecta y lista las malas prácticas en `index.html`." 
-- Pide a la IA que aplique cambios con parches (apply_patch) y que deje comentarios TODO para los estudiantes.
+  - "Agrega una página de reportes de pedidos."
+  - "Escribe pruebas unitarias para `pedidos.js`."
+  - "Revisa `database.rules.json` y sugiere mejoras de seguridad."
 
-Entregables esperados
-- Una versión MPA con archivos HTML separados.
-- Un archivo `css/styles.css` que unifique estilos.
-- Carpeta `js/` con módulos claros y sin variables globales.
-- Un breve `CHANGELOG.md` o un PR/commit donde se describan las refactorizaciones.
-
-Notas finales
-- El repositorio contiene intencionalmente malas prácticas para que los estudiantes las identifiquen y corrijan.
-- Mantener un flujo de trabajo en branches y commits pequeños ayuda a usar la IA para revisiones iterativas.
-
-Si quieres, puedo:
-- Añadir comentarios TODO directamente dentro de `index.html` para guiar a los estudiantes.
-- Generar una estructura de archivos inicial (carpetas `css/`, `js/`, `pages/`) y mover/crear archivos básicos.
-
-Autor: Instructor (plantilla para taller)
+Autor: Instructor (plantilla para taller) — refactorización asistida por IA.
