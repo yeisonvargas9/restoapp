@@ -20,12 +20,21 @@
  * pero de todas formas es buena práctica no versionar este archivo
  * con datos reales si tu flujo de trabajo lo exige.
  */
-export const firebaseConfig = {
-  apiKey: "TODO_REEMPLAZAR",
-  authDomain: "TODO_REEMPLAZAR",
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCkAk6TXaJBLgzN-LAmaZqJWJPia6RDXOw",
+  authDomain: "restoapp-415df.firebaseapp.com",
   databaseURL: "https://restoapp-415df-default-rtdb.firebaseio.com",
-  projectId: "TODO_REEMPLAZAR",
-  storageBucket: "TODO_REEMPLAZAR",
-  messagingSenderId: "TODO_REEMPLAZAR",
-  appId: "TODO_REEMPLAZAR",
+  projectId: "restoapp-415df",
+  storageBucket: "restoapp-415df.firebasestorage.app",
+  messagingSenderId: "900119494168",
+  appId: "1:900119494168:web:afed6e01056c36fcb14d6d"
 };
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
