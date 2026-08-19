@@ -124,6 +124,56 @@ del proyecto `restoapp-415df`:
    agrégalo en Authentication → Settings → Authorized domains, o
    Firebase Auth rechazará los inicios de sesión desde ese dominio.
 
+## Corrección: js/firebase-config.js roto (versión del 15/08 con GPT)
+
+Al retomar el proyecto desde el ZIP subido a GitHub (hecho con ayuda de
+otra IA), `js/firebase-config.js` tenía dos problemas que impedían el
+login por completo:
+
+1. `import { initializeApp } from "firebase/app";` — especificador de
+   módulo "desnudo", válido solo con un empaquetador (Vite/Webpack) o
+   un import map. El navegador no puede resolverlo directamente y esto
+   rompía la carga de **todo** el módulo (y en cascada, `firebase-init.js`,
+   `auth-service.js`, `login-page.js`), por eso el login no hacía nada.
+2. El objeto `firebaseConfig` no se exportaba (`const` en vez de
+   `export const`), así que aunque el import anterior funcionara,
+   `firebase-init.js` habría recibido `undefined`.
+3. Además, ese archivo llamaba a `initializeApp()` por su cuenta,
+   duplicando la responsabilidad de `firebase-init.js`.
+
+Se corrigió manteniendo los valores reales ya configurados
+(`apiKey`, `authDomain`, `projectId`, `storageBucket`,
+`messagingSenderId`, `appId`, todos del proyecto `restoapp-415df`):
+ahora el archivo solo define y exporta `firebaseConfig` usando
+`export const`, sin importar el SDK ni inicializar la app — esa
+inicialización sigue centralizada en `firebase-init.js`, como estaba
+diseñado originalmente. El resto del proyecto (HTML, CSS, demás JS)
+no tenía diferencias con la versión de referencia.
+
+## Puerta de calidad (quality-gate/) — herramienta de desarrollo
+
+Se agregó `quality-gate/`, una herramienta de línea de comandos
+(Node.js, sin dependencias externas) inspirada en el patrón
+**PocketFlow** (nodos con `prep → exec → post` encadenados en un
+`Flow`), combinada con **evaluadores locales rigurosos** (reglas
+estáticas) y una revisión opcional con **Mistral AI**.
+
+- No forma parte de la aplicación web desplegada — es un script que
+  se corre manualmente o desde un pipeline de CI/CD antes de subir
+  cambios.
+- Sin `MISTRAL_API_KEY` configurada, igual funciona: solo con los
+  evaluadores locales, y lo deja explícito en el reporte (no inventa
+  resultados de IA).
+- Genera `quality-gate/reportes/ultimo-reporte.md` y termina con
+  código de salida `0` (aprobado) o `1` (bloqueado) si hay hallazgos
+  críticos.
+- Ver `quality-gate/README.md` para instrucciones de uso y cómo
+  obtener la API key de Mistral.
+- **Nota:** el paso de Mistral AI no se pudo probar contra la API real
+  desde el entorno donde se generó este código (sin salida de red
+  hacia `api.mistral.ai`); probarlo con una key real antes de
+  confiar en él para bloquear despliegues.
+
 ## No se implementó (fuera de alcance)
 
 - Backend propio / servidor intermedio: el taller pedía usar Firebase

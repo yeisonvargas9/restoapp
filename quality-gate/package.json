@@ -1,0 +1,13 @@
+{
+  "name": "resto-app-quality-gate",
+  "version": "1.0.0",
+  "description": "Puerta de calidad estilo PocketFlow + Mistral AI para el proyecto RestoApp",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "quality-gate": "node run.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
